@@ -1,7 +1,7 @@
 {
-  "name": "logger",
+  "name": "colorful-logger",
   "version": "1.0.0",
-  "description": "A colorful and feature-rich (log.js) logging library for Node.js and browser",
+  "description": "A colorful and feature-rich logging library for Node.js and browser",
   "main": "src/logger.js",
   "module": "src/logger.js",
   "type": "module",
@@ -10,7 +10,7 @@
       "lint": "eslint src/"
   },
   "keywords": ["logger", "logging", "debug", "console", "colorful"],
-  "author": "Your Name",
+  "author": "hipster santos",
   "license": "MIT",
   "devDependencies": {
       "eslint": "^8.0.0"

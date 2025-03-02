@@ -5,13 +5,13 @@ A feature-rich, colorful logging library for Node.js and browser environments.
 
 Installation
 
-npm install logger
+npm install colorful-logger
 
 Basic Usage
 
 import Logger from 'logger';
 // or
-const Logger = require('logger');
+const Logger = require('colorful-logger');
 
 const logger = Logger.getLogger('MyApp');
 logger.info('Hello World!');
