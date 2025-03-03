@@ -1,138 +1,173 @@
-log.js
-colorful-logger
+# @hipstersantos/colorful-logger
 
 A feature-rich, colorful logging library for Node.js and browser environments.
 
-Installation
+https://github.com/HipsterSantos/log.js
 
-npm install colorful-logger
+## 🌟 Features
 
-Basic Usage
+- 🌈 **Color-coded log levels** for easy visual identification.
+- 📊 **Stack tracing** for in-depth error inspection.
+- 🔧 **Customizable options** to suit your logging needs.
+- 🌐 **Cross-environment support** (Node.js and browser).
+- 🛠️ **Error monitoring** with uncaught exceptions and promise rejection handling.
+- 📦 **Metadata support** to add extra context to logs.
 
-import Logger from 'logger';
-// or
-const Logger = require('colorful-logger');
+## 📥 Installation
+
+```bash
+npm install @hipstersantos/colorful-logger
+```
+
+## 🚀 Quick Start
+
+### ES Module
+```javascript
+import Logger from '@hipstersantos/colorful-logger';
 
 const logger = Logger.getLogger('MyApp');
-logger.info('Hello World!');
+logger.info('Hello, world!');
+```
 
-Features
+### CommonJS
+```javascript
+const Logger = require('@hipstersantos/colorful-logger');
 
-- Color-coded log levels
-- Stack tracing
-- Customizable options
-- Browser and Node.js support
-- Error monitoring
-- Metadata support
+const logger = Logger.getLogger('MyApp');
+logger.info('Hello, world!');
+```
 
-Configuration Options
+## 🔧 Configuration Options
 
+```javascript
 const logger = new Logger('App', {
-    showTimestamp: true,
-    showCaller: true,
-    env: 'development',
-    exitOnError: true,
-    suppressBrowserErrors: false
+    showTimestamp: true,         // Display timestamp (default: true)
+    showCaller: true,            // Display caller information (default: true)
+    env: 'development',          // Environment ("development" or "production")
+    exitOnError: true,           // Exit process on uncaught exceptions (default: true)
+    suppressBrowserErrors: false // Suppress browser errors (default: false)
 });
+```
 
-Usage Examples
+## 📊 Usage Examples
 
-1. Basic logging
-log.info('Server started');
+### 1. Basic Logging
+```javascript
+logger.info('Application started');
+```
 
-2. Debug with metadata
-log.debug('Processing request', { userId: 123 });
+### 2. Debugging with Metadata
+```javascript
+logger.debug('User fetched', { userId: 42 });
+```
 
-3. Warning with custom data
-log.warning('Resource low', { memory: '256MB' });
+### 3. Warnings
+```javascript
+logger.warning('Disk space low', { freeSpace: '500MB' });
+```
 
-4. Error with stack trace
-log.error('Database connection failed', new Error('Connection timeout'));
+### 4. Error Logging with Stack Trace
+```javascript
+const error = new Error('Connection failed');
+logger.error('Database error', error);
+```
 
-5. Critical error
-log.critical('System crash', { reason: 'OOM' });
+### 5. Critical Errors
+```javascript
+logger.critical('System crash detected', { reason: 'Out of Memory' });
+```
 
-6. Custom logger name
-const dbLog = Logger.getLogger('Database');
-dbLog.info('Query executed');
+### 6. Custom Logger Instances
+```javascript
+const dbLogger = Logger.getLogger('Database');
+dbLogger.info('Query executed');
+```
 
-7. No timestamp
-const noTimeLog = new Logger('NoTime', { showTimestamp: false });
-noTimeLog.info('Quick log');
+### 7. Handling Uncaught Exceptions
+```javascript
+setTimeout(() => { throw new Error('Unexpected error'); }, 1000);
+```
 
-8. No caller info
-const noCallerLog = new Logger('NoCaller', { showCaller: false });
-noCallerLog.debug('Simple debug');
+### 8. Handling Promise Rejections
+```javascript
+Promise.reject(new Error('Promise failed'));
+```
 
-9. Production mode (no debug logs)
-const prodLog = new Logger('Prod', { env: 'production' });
-prodLog.debug('This won’t show');
-prodLog.info('This will show');
-
-10. Browser-specific
+### 9. Browser-Specific Logging
+```javascript
 if (typeof window !== 'undefined') {
-    log.info('Running in browser');
+    logger.info('Running in browser');
 }
+```
 
-11. With object metadata
-log.info('User login', { user: { id: 1, name: 'John' } });
+### 10. Production Mode (Suppress Debug)
+```javascript
+const prodLogger = new Logger('ProdApp', { env: 'production' });
+prodLogger.debug('This will not log');
+```
 
-12. Multiple metadata fields
-log.warning('API rate limit', { limit: 1000, current: 999 });
+### 11. Conditional Logging
+```javascript
+const isVerbose = true;
+if (isVerbose) logger.debug('Verbose logging enabled');
+```
 
-13. Error with custom metadata
-log.error('Validation failed', { field: 'email', value: 'invalid' });
+## 📚 API Reference
 
-14. Nested groups in browser
-log.info('Complex operation', { step: 1, details: { status: 'ok' } });
+### `Logger(name, options)`
 
-15. Testing uncaught exception
-setTimeout(() => { throw new Error('Test error'); }, 1000);
+| Parameter      | Type    | Default       | Description                          |
+|----------------|---------|---------------|--------------------------------------|
+| `name`         | string  | "root"        | Logger name (for grouping logs).     |
+| `options`      | object  | `{}`          | Configuration options.               |
 
-16. Promise rejection
-Promise.reject('Test rejection');
+**Options:**
 
-17. Long message
-log.info('This is a very long message to test how it wraps in the console output');
+| Option                 | Type     | Default        | Description                                      |
+|------------------------|----------|----------------|--------------------------------------------------|
+| `showTimestamp`        | boolean  | `true`         | Show timestamp in logs.                          |
+| `showCaller`           | boolean  | `true`         | Include caller information in logs.              |
+| `env`                  | string   | `"development"`| Environment mode ("development" or "production").|
+| `exitOnError`          | boolean  | `true`         | Exit process on errors (Node.js only).           |
+| `suppressBrowserErrors`| boolean  | `false`        | Suppress browser errors.                         |
 
-18. Multiple loggers
-const authLog = Logger.getLogger('Auth');
-authLog.info('Login attempt');
-log.info('Main process continues');
+### Logger Methods
 
-19. Custom stack depth
-log.error('Deep error', { stack: log.getFullStack() });
+| Method                    | Description                                      |
+|---------------------------|--------------------------------------------------|
+| `info(message, meta)`     | Logs an informational message.                   |
+| `debug(message, meta)`    | Logs a debug message (hidden in production).     |
+| `warning(message, meta)`  | Logs a warning message.                           |
+| `error(message, meta)`    | Logs an error message with a stack trace.         |
+| `critical(message, meta)` | Logs a critical message with an extended stack trace.|
+| `getLogger(name, options)`| Returns a new logger instance.                    |
 
-20. Conditional logging
-const verbose = true;
-if (verbose) log.debug('Verbose mode enabled');
+## 📊 Integration & Use Cases
 
-21. Timestamp override
-const customTimeLog = new Logger('CustomTime', { showTimestamp: false });
-customTimeLog.info('No time shown');
+1. **Error Reporting:** Automatically captures and logs uncaught exceptions and promise rejections.
+2. **Microservices:** Use unique logger instances for each service.
+3. **Performance Monitoring:** Monitor system resources and app health.
+4. **Browser Debugging:** Capture and log client-side errors.
 
-22. Error with full context
-log.error('Complex failure', { status: 500, retry: false, error: new Error('API down') });
+## 🧪 Testing
 
-API Reference
+Ensure all functionality works as expected:
 
-Logger(name, options) - Creates a new logger instance
-- name: string (default: "root")
-- options: object
-  - showTimestamp: boolean (default: true)
-  - showCaller: boolean (default: true)
-  - env: string (default: "development")
-  - exitOnError: boolean (default: true)
-  - suppressBrowserErrors: boolean (default: false)
+```bash
+npm test
+```
 
-Methods:
-- info(message, meta) - Log an info message
-- debug(message, meta) - Log a debug message (skipped in production)
-- warning(message, meta) - Log a warning message
-- error(message, errOrMeta) - Log an error message with stack trace
-- critical(message, errOrMeta) - Log a critical message with stack trace
-- static getLogger(name, options) - Get a logger instance
 
-License
+## 📜 License
 
-MIT
+This project is licensed under the [MIT License](LICENSE).
+
+## 📣 Contributing
+
+We welcome contributions! Feel free to open issues and submit pull requests.
+
+## 📬 Contact
+
+Author: [hipstersantos](mailto:santoscampos269@gmail.com)
+
+Stay tuned for upcoming features and updates!
