@@ -8,6 +8,11 @@ const COLORS = {
     CRITICAL: "\x1b[41m\x1b[37m", // Red background, white text
 };
 
+// Detect module type based on environment
+const isESM = typeof import.meta !== 'undefined' || (typeof process !== 'undefined' && process.versions && process.versions.node && require.main && require.main.filename.endsWith('.mjs'));
+const isCommonJS = typeof module !== 'undefined' && module.exports && !isESM;
+const isBrowser = typeof window !== 'undefined' && typeof window.document !== 'undefined';
+
 class Logger {
     constructor(name = "root", options = {}) {
         this.name = name;
@@ -15,6 +20,7 @@ class Logger {
             showTimestamp: options.showTimestamp ?? true,
             showCaller: options.showCaller ?? true,
             env: options.env || (typeof process !== "undefined" ? process.env.NODE_ENV : "development"),
+            dynamicImport: options.dynamicImport ?? false, // New option for dynamic import
             ...options,
         };
         this.monitorErrors();
@@ -43,8 +49,7 @@ class Logger {
         const timestamp = this.options.showTimestamp ? new Date().toISOString() : "";
         const color = COLORS[level.toUpperCase()] || COLORS.INFO;
         const callerInfo = this.options.showCaller ? this.getCallerInfo() : "";
-        const isBrowser = typeof window !== "undefined";
-        const prefix = isBrowser 
+        const prefix = isBrowser
             ? `[${this.name}] [${level.toUpperCase()}]`
             : `${color}[${timestamp}] [${this.name}] [${level.toUpperCase()}]${this.options.showCaller ? ` [${callerInfo}]` : ""}${COLORS.RESET}`;
 
@@ -93,7 +98,7 @@ class Logger {
                 this.warning(`Unhandled Promise Rejection: ${reason}`, { promise });
             });
         }
-        if (typeof window !== "undefined") {
+        if (isBrowser) {
             window.onerror = (msg, url, line, col, error) => {
                 this.error(`Browser Error: ${msg}`, error);
                 return this.options.suppressBrowserErrors !== true;
@@ -104,9 +109,34 @@ class Logger {
     static getLogger(name, options) {
         return new Logger(name, options);
     }
+
+    // Dynamic import support for lazy loading
+    static async dynamicImport(name = "root", options = {}) {
+        if (isCommonJS) {
+            const module = await import('./logger.js');
+            return module.default.getLogger(name, { ...options, dynamicImport: true });
+        }
+        return Logger.getLogger(name, { ...options, dynamicImport: true });
+    }
 }
 
+// ESM Export
 export default Logger;
-if (typeof module !== "undefined" && module.exports) {
+
+// CommonJS Export
+if (isCommonJS) {
     module.exports = Logger;
+    module.exports.dynamicImport = Logger.dynamicImport; // Export dynamic import method
+}
+
+// Auto-detection and dynamic import usage example
+if (typeof require !== "undefined" && require.main === module) {
+    (async () => {
+        const logger = isESM || isBrowser
+            ? Logger.getLogger("Test")
+            : await Logger.dynamicImport("Test");
+        logger.info("Logger initialized automatically");
+        logger.debug("Debugging mode", { moduleType: isESM ? "ESM" : isCommonJS ? "CommonJS" : "Browser" });
+        logger.error("Test error", new Error("Sample error"));
+    })();
 }

@@ -1,173 +1,229 @@
 # @hipstersantos/colorful-logger
 
-A feature-rich, colorful logging library for Node.js and browser environments.
+A feature-rich, colorful logging library for **Node.js** and **browser** environments, now with seamless support for **ES Modules (ESM)**, **CommonJS**, and **automatic module detection**.
 
-https://github.com/HipsterSantos/log.js
+[GitHub Repository](https://github.com/hipstersantos/colorful-logger) | [npm Package](https://www.npmjs.com/package/@hipstersantos/colorful-logger)
 
-## 🌟 Features
+---
 
-- 🌈 **Color-coded log levels** for easy visual identification.
-- 📊 **Stack tracing** for in-depth error inspection.
-- 🔧 **Customizable options** to suit your logging needs.
-- 🌐 **Cross-environment support** (Node.js and browser).
-- 🛠️ **Error monitoring** with uncaught exceptions and promise rejection handling.
-- 📦 **Metadata support** to add extra context to logs.
+## 🚀 Features
+
+- 🎨 **Color-Coded Log Levels**: Visually distinguish `INFO`, `DEBUG`, `WARNING`, `ERROR`, and `CRITICAL` logs.
+- 📊 **Stack Tracing**: Get detailed caller information and full stack traces for easier debugging.
+- ⚙️ **Customizable Options**: Tailor logging behavior to your specific needs.
+- 🌐 **Universal Compatibility**: Works seamlessly in Node.js (ESM & CommonJS) and browser environments.
+- 🛡️ **Error Monitoring**: Automatically captures uncaught exceptions and unhandled promise rejections.
+- 📝 **Metadata Support**: Add rich context to logs with objects, arrays, or custom data.
+- 🔍 **Module Detection**: Automatically adapts to your project’s module system (ESM or CommonJS).
+- 📦 **Dynamic Import**: Supports lazy loading for performance optimization.
+
+---
 
 ## 📥 Installation
+
+Install via **npm**:
 
 ```bash
 npm install @hipstersantos/colorful-logger
 ```
 
-## 🚀 Quick Start
+Or via **Yarn**:
 
-### ES Module
+```bash
+yarn add @hipstersantos/colorful-logger
+```
+
+---
+
+## 📚 Quick Start
+
+### ES Module (ESM)
+
 ```javascript
 import Logger from '@hipstersantos/colorful-logger';
 
 const logger = Logger.getLogger('MyApp');
-logger.info('Hello, world!');
+logger.info('Hello from ESM!');
 ```
 
 ### CommonJS
+
 ```javascript
 const Logger = require('@hipstersantos/colorful-logger');
 
 const logger = Logger.getLogger('MyApp');
-logger.info('Hello, world!');
+logger.info('Hello from CommonJS!');
 ```
 
-## 🔧 Configuration Options
+### Dynamic Import (Lazy Loading)
+
+```javascript
+const loggerPromise = require('@hipstersantos/colorful-logger').dynamicImport('MyApp');
+loggerPromise.then(logger => logger.info('Hello with dynamic import!'));
+```
+
+### Browser
+
+```html
+<script type="module">
+  import Logger from 'https://unpkg.com/@hipstersantos/colorful-logger@1.2.0/src/logger.js';
+  const logger = Logger.getLogger('BrowserApp');
+  logger.info('Hello from the browser!');
+</script>
+```
+
+---
+
+## ⚙️ Configuration Options
+
+Customize your logger:
 
 ```javascript
 const logger = new Logger('App', {
-    showTimestamp: true,         // Display timestamp (default: true)
-    showCaller: true,            // Display caller information (default: true)
-    env: 'development',          // Environment ("development" or "production")
-    exitOnError: true,           // Exit process on uncaught exceptions (default: true)
-    suppressBrowserErrors: false // Suppress browser errors (default: false)
+  showTimestamp: true,          // Display timestamps (default: true)
+  showCaller: true,             // Show caller info (default: true)
+  env: 'development',           // Environment mode (default: process.env.NODE_ENV)
+  exitOnError: true,            // Exit on uncaught errors (Node.js only)
+  suppressBrowserErrors: false, // Suppress browser error handling (default: false)
+  dynamicImport: false          // Enable lazy loading (CommonJS only, default: false)
 });
 ```
 
-## 📊 Usage Examples
+---
 
-### 1. Basic Logging
+## 📖 Usage Examples
+
+### Basic Logging
+
 ```javascript
-logger.info('Application started');
+logger.info('App started');
+logger.debug('Initializing');
+logger.warning('Low memory');
+logger.error('Failed to connect');
+logger.critical('System down');
 ```
 
-### 2. Debugging with Metadata
+### Metadata Support
+
 ```javascript
-logger.debug('User fetched', { userId: 42 });
+logger.info('User logged in', { userId: 123 });
+logger.warning('API limit', { limit: 1000, current: 995 });
+logger.info('Profile update', { user: { id: 1, name: 'Alice' } });
+logger.debug('Batch done', { items: [1, 2, 3] });
 ```
 
-### 3. Warnings
+### Error Handling
+
 ```javascript
-logger.warning('Disk space low', { freeSpace: '500MB' });
+logger.error('DB error', new Error('Timeout'));
+logger.error('Manual trace', { stack: logger.getFullStack() });
+
+setTimeout(() => { throw new Error('Crash'); }, 1000);
+
+Promise.reject('Failed promise');
 ```
 
-### 4. Error Logging with Stack Trace
+### Customization
+
 ```javascript
-const error = new Error('Connection failed');
-logger.error('Database error', error);
+const noTime = new Logger('NoTime', { showTimestamp: false });
+noTime.info('Quick log');
+
+const prod = new Logger('Prod', { env: 'production' });
+prod.debug('Hidden');
+prod.info('Visible');
 ```
 
-### 5. Critical Errors
+### Multiple Loggers
+
 ```javascript
-logger.critical('System crash detected', { reason: 'Out of Memory' });
+const auth = Logger.getLogger('Auth');
+const payment = Logger.getLogger('Payment');
+
+auth.info('User login');
+payment.info('Transaction started');
 ```
 
-### 6. Custom Logger Instances
-```javascript
-const dbLogger = Logger.getLogger('Database');
-dbLogger.info('Query executed');
-```
+---
 
-### 7. Handling Uncaught Exceptions
-```javascript
-setTimeout(() => { throw new Error('Unexpected error'); }, 1000);
-```
-
-### 8. Handling Promise Rejections
-```javascript
-Promise.reject(new Error('Promise failed'));
-```
-
-### 9. Browser-Specific Logging
-```javascript
-if (typeof window !== 'undefined') {
-    logger.info('Running in browser');
-}
-```
-
-### 10. Production Mode (Suppress Debug)
-```javascript
-const prodLogger = new Logger('ProdApp', { env: 'production' });
-prodLogger.debug('This will not log');
-```
-
-### 11. Conditional Logging
-```javascript
-const isVerbose = true;
-if (isVerbose) logger.debug('Verbose logging enabled');
-```
-
-## 📚 API Reference
+## 📊 API Reference
 
 ### `Logger(name, options)`
 
-| Parameter      | Type    | Default       | Description                          |
-|----------------|---------|---------------|--------------------------------------|
-| `name`         | string  | "root"        | Logger name (for grouping logs).     |
-| `options`      | object  | `{}`          | Configuration options.               |
+| Parameter  | Type    | Default          | Description                         |
+|------------|---------|------------------|-------------------------------------|
+| `name`     | String  | "root"           | Logger identifier.                  |
+| `options`  | Object  | `{}`             | Logger configuration options.       |
 
-**Options:**
+### Options
 
-| Option                 | Type     | Default        | Description                                      |
-|------------------------|----------|----------------|--------------------------------------------------|
-| `showTimestamp`        | boolean  | `true`         | Show timestamp in logs.                          |
-| `showCaller`           | boolean  | `true`         | Include caller information in logs.              |
-| `env`                  | string   | `"development"`| Environment mode ("development" or "production").|
-| `exitOnError`          | boolean  | `true`         | Exit process on errors (Node.js only).           |
-| `suppressBrowserErrors`| boolean  | `false`        | Suppress browser errors.                         |
+| Option              | Type     | Default          | Description                                |
+|---------------------|----------|------------------|--------------------------------------------|
+| `showTimestamp`     | Boolean  | `true`           | Display timestamps in log messages.        |
+| `showCaller`        | Boolean  | `true`           | Display the caller function info.          |
+| `env`               | String   | `development`    | Environment mode (e.g., development, production). |
+| `exitOnError`       | Boolean  | `true`           | Exit process on errors (Node.js only).     |
+| `suppressBrowserErrors` | Boolean  | `false`      | Suppress errors in the browser console.    |
+| `dynamicImport`     | Boolean  | `false`          | Enable lazy loading (CommonJS only).       |
 
-### Logger Methods
+### Methods
 
-| Method                    | Description                                      |
-|---------------------------|--------------------------------------------------|
-| `info(message, meta)`     | Logs an informational message.                   |
-| `debug(message, meta)`    | Logs a debug message (hidden in production).     |
-| `warning(message, meta)`  | Logs a warning message.                           |
-| `error(message, meta)`    | Logs an error message with a stack trace.         |
-| `critical(message, meta)` | Logs a critical message with an extended stack trace.|
-| `getLogger(name, options)`| Returns a new logger instance.                    |
+| Method                    | Description                                 |
+|---------------------------|---------------------------------------------|
+| `info(message, meta)`     | Logs an informational message (blue).       |
+| `debug(message, meta)`    | Logs a debug message (cyan).                |
+| `warning(message, meta)`  | Logs a warning message (yellow).             |
+| `error(message, meta)`    | Logs an error message (red) with stack trace.|
+| `critical(message, meta)` | Logs a critical message (red background).    |
+| `getLogger(name, options)`| Creates a new logger instance.               |
+| `dynamicImport(name)`     | Lazily loads a logger (CommonJS only).       |
 
-## 📊 Integration & Use Cases
+---
 
-1. **Error Reporting:** Automatically captures and logs uncaught exceptions and promise rejections.
-2. **Microservices:** Use unique logger instances for each service.
-3. **Performance Monitoring:** Monitor system resources and app health.
-4. **Browser Debugging:** Capture and log client-side errors.
+## 📌 Integration & Use Cases
 
-## 🧪 Testing
+- **Error Tracking**: Capture and log unhandled errors and rejections.
+- **Microservices**: Use named loggers for different services.
+- **Frontend Debugging**: Track user actions and browser events.
+- **Backend Monitoring**: Log API calls, database queries, and file operations.
+- **Testing**: Enhance test output with colorful, structured logs.
 
-Ensure all functionality works as expected:
+---
+
+## ✅ Testing
+
+Run the test suite:
 
 ```bash
 npm test
 ```
 
+---
 
 ## 📜 License
 
-This project is licensed under the [MIT License](LICENSE).
+Released under the [MIT License](LICENSE).
 
-## 📣 Contributing
+---
 
-We welcome contributions! Feel free to open issues and submit pull requests.
+## 🤝 Contributing
 
-## 📬 Contact
+Fork the repository, create a feature branch, and submit a pull request.
+
+---
+
+## 📧 Contact
 
 Author: [hipstersantos](mailto:santoscampos269@gmail.com)
 
-Stay tuned for upcoming features and updates!
+---
+
+## 📆 Changelog
+
+### 1.2.0 (March 2025)
+
+- Added ESM and CommonJS support.
+- Introduced automatic module detection.
+- Implemented `dynamicImport` for lazy loading.
+- Expanded examples to 50+ scenarios.
+

@@ -1,7 +1,15 @@
 // examples/usage.js
+
+// ESM import (for direct usage in ESM projects)
 import Logger from '../src/logger.js';
 
-// 1. Basic Logger Instance
+// Helper to handle dynamic import for CommonJS or mixed contexts
+async function getDynamicLogger(name, options) {
+  const loggerModule = await Logger.dynamicImport(name, options);
+  return loggerModule;
+}
+
+// 1. Basic Logger Instance (ESM)
 const log = Logger.getLogger('ExampleApp');
 log.info('Server started successfully');
 
@@ -99,6 +107,121 @@ timeOnlyLog.warning('Operation took longer than expected');
 
 // 25. Debug with Empty Metadata
 log.debug('Simple debug log', {});
+
+// 26. Dynamic Import Example (CommonJS Simulation)
+(async () => {
+    const dynamicLog = await getDynamicLogger('DynamicExample');
+    dynamicLog.info('Logger loaded dynamically');
+})();
+
+// 27. Module Type Detection
+log.debug('Module environment', { type: typeof require === 'undefined' ? 'ESM' : 'CommonJS' });
+
+// 28. Null Metadata
+log.info('Null metadata test', null);
+
+// 29. Undefined Metadata
+log.debug('Undefined metadata test', undefined);
+
+// 30. Empty String Message
+log.warning('');
+
+// 31. Special Characters
+log.info('Special characters', { value: '!@#$%^&*' });
+
+// 32. Large Data Object
+log.debug('Large data', { array: Array(50).fill('x') });
+
+// 33. Loop Logging
+for (let i = 0; i < 3; i++) {
+    log.info(`Loop iteration ${i}`);
+}
+
+// 34. Async Operation Logging
+async function asyncOperation() {
+    log.debug('Async start');
+    await new Promise(resolve => setTimeout(resolve, 500));
+    log.info('Async complete');
+}
+asyncOperation();
+
+// 35. Random Data Logging
+log.info('Random value', { number: Math.random() });
+
+// 36. High-Frequency Logging
+let count = 0;
+const interval = setInterval(() => {
+    if (count++ < 5) log.info('Tick');
+    else clearInterval(interval);
+}, 200);
+
+// 37. Browser-Specific Window Info
+if (typeof window !== 'undefined') {
+    log.debug('Window info', { width: window.innerWidth, height: window.innerHeight });
+}
+
+// 38. Event Listener Logging
+if (typeof window !== 'undefined') {
+    window.addEventListener('click', () => log.info('User clicked'));
+}
+
+// 39. Node-Specific Process Info
+if (typeof process !== 'undefined') {
+    log.info('Node process', { pid: process.pid, version: process.version });
+}
+
+// 40. API Call Simulation
+async function simulateApiCall() {
+    log.info('API call starting');
+    await new Promise(resolve => setTimeout(resolve, 300));
+    log.info('API call finished');
+}
+simulateApiCall();
+
+// 41. Database Query Logging
+log.debug('Query executed', { sql: 'SELECT * FROM users' });
+
+// 42. File Operation Logging
+log.info('File read', { path: './config.json' });
+
+// 43. User Action Logging
+log.info('Button clicked', { buttonId: 'submit' });
+
+// 44. Session Logging
+log.info('Session started', { sessionId: 'xyz789' });
+
+// 45. Performance Test - Bulk Logging
+for (let i = 0; i < 10; i++) {
+    log.debug(`Bulk log ${i}`);
+}
+
+// 46. Custom Logger with Dynamic Import
+(async () => {
+    const dynCustom = await getDynamicLogger('DynamicCustom', { showTimestamp: false });
+    dynCustom.info('Dynamic custom logger');
+})();
+
+// 47. Error with No Stack
+log.error('Simple error', { message: 'No stack provided' });
+
+// 48. Warning with Nested Object
+log.warning('Complex warning', { config: { retries: 3, delay: { ms: 500 } } });
+
+// 49. Browser Group Collapse Test
+log.info('Browser group', { step: 1, details: { ok: true, value: 42 } });
+
+// 50. Production Dynamic Import
+(async () => {
+    const prodDynamic = await getDynamicLogger('ProdDynamic', { env: 'production' });
+    prodDynamic.debug('This won’t show in production');
+    prodDynamic.info('Production dynamic log');
+})();
+
+// 51. Mixed Context with Array and Error
+log.error('Mixed failure', { codes: [400, 401], error: new Error('Auth failed') });
+
+// 52. Startup Sequence
+log.info('App startup sequence', { phase: 'init', time: Date.now() });
 
 // Run the script if executed directly
 if (typeof require !== 'undefined' && require.main === module) {
