@@ -1,6 +1,6 @@
 {
   "name": "@hipstersantos/colorful-logger",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "A colorful and feature-rich logging library for Node.js and browser",
   "main": "src/logger.js",
   "module": "src/logger.js",
