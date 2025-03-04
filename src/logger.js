@@ -5,10 +5,9 @@ const COLORS = {
     DEBUG: "\x1b[36m",
     WARNING: "\x1b[33m",
     ERROR: "\x1b[31m",
-    CRITICAL: "\x1b[41m\x1b[37m", // Red background, white text
+    CRITICAL: "\x1b[41m\x1b[37m",
 };
 
-// Detect module type based on environment
 const isESM = typeof import.meta !== 'undefined' || (typeof process !== 'undefined' && process.versions && process.versions.node && require.main && require.main.filename.endsWith('.mjs'));
 const isCommonJS = typeof module !== 'undefined' && module.exports && !isESM;
 const isBrowser = typeof window !== 'undefined' && typeof window.document !== 'undefined';
@@ -20,13 +19,12 @@ class Logger {
             showTimestamp: options.showTimestamp ?? true,
             showCaller: options.showCaller ?? true,
             env: options.env || (typeof process !== "undefined" ? process.env.NODE_ENV : "development"),
-            dynamicImport: options.dynamicImport ?? false, // New option for dynamic import
+            dynamicImport: options.dynamicImport ?? false,
             ...options,
         };
         this.monitorErrors();
     }
 
-    // Enhanced stack tracing
     getCallerInfo(stackOffset = 3) {
         const stack = new Error().stack.split("\n");
         const callerLine = stack[stackOffset] || "unknown";
@@ -38,9 +36,25 @@ class Logger {
         return "unknown";
     }
 
-    // Get full stack trace
     getFullStack() {
         return new Error().stack.split("\n").slice(2).join("\n");
+    }
+
+    // Simulate log output for VSCode extension
+    simulateLog(level, message, meta = {}) {
+        if (this.options.env === "production" && level === "DEBUG") return "Debug suppressed in production";
+
+        const timestamp = this.options.showTimestamp ? new Date().toISOString() : "";
+        const color = COLORS[level.toUpperCase()] || COLORS.INFO;
+        const callerInfo = this.options.showCaller ? this.getCallerInfo(4) : ""; // Offset for extension
+        const prefix = isBrowser
+            ? `[${this.name}] [${level.toUpperCase()}]`
+            : `${color}[${timestamp}] [${this.name}] [${level.toUpperCase()}]${this.options.showCaller ? ` [${callerInfo}]` : ""}${COLORS.RESET}`;
+
+        let output = `${prefix} ${message}`;
+        if (meta.stack) output += `\n${color}${meta.stack}${COLORS.RESET}`;
+        if (Object.keys(meta).length) output += `\n${color}Meta: ${JSON.stringify(meta, null, 2)}${COLORS.RESET}`;
+        return output;
     }
 
     log(level, message, meta = {}) {
@@ -110,7 +124,6 @@ class Logger {
         return new Logger(name, options);
     }
 
-    // Dynamic import support for lazy loading
     static async dynamicImport(name = "root", options = {}) {
         if (isCommonJS) {
             const module = await import('./logger.js');
@@ -120,23 +133,16 @@ class Logger {
     }
 }
 
-// ESM Export
 export default Logger;
 
-// CommonJS Export
 if (isCommonJS) {
     module.exports = Logger;
-    module.exports.dynamicImport = Logger.dynamicImport; // Export dynamic import method
+    module.exports.dynamicImport = Logger.dynamicImport;
 }
 
-// Auto-detection and dynamic import usage example
 if (typeof require !== "undefined" && require.main === module) {
     (async () => {
-        const logger = isESM || isBrowser
-            ? Logger.getLogger("Test")
-            : await Logger.dynamicImport("Test");
+        const logger = isESM || isBrowser ? Logger.getLogger("Test") : await Logger.dynamicImport("Test");
         logger.info("Logger initialized automatically");
-        logger.debug("Debugging mode", { moduleType: isESM ? "ESM" : isCommonJS ? "CommonJS" : "Browser" });
-        logger.error("Test error", new Error("Sample error"));
     })();
 }

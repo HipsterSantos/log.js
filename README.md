@@ -2,7 +2,7 @@
 
 A feature-rich, colorful logging library for **Node.js** and **browser** environments, now with seamless support for **ES Modules (ESM)**, **CommonJS**, and **automatic module detection**.
 
-[GitHub Repository](https://github.com/hipstersantos/colorful-logger) | [npm Package](https://www.npmjs.com/package/@hipstersantos/colorful-logger)
+[GitHub Repository](https://github.com/HipsterSantos/log.js) | [npm Package](https://www.npmjs.com/package/@hipstersantos/colorful-logger)
 
 ---
 
@@ -16,6 +16,7 @@ A feature-rich, colorful logging library for **Node.js** and **browser** environ
 - 📝 **Metadata Support**: Add rich context to logs with objects, arrays, or custom data.
 - 🔍 **Module Detection**: Automatically adapts to your project’s module system (ESM or CommonJS).
 - 📦 **Dynamic Import**: Supports lazy loading for performance optimization.
+- 🖥️ **VSCode Integration**: Displays log output directly in hover tooltips within VSCode.
 
 ---
 
@@ -80,68 +81,53 @@ Customize your logger:
 
 ```javascript
 const logger = new Logger('App', {
-  showTimestamp: true,          // Display timestamps (default: true)
-  showCaller: true,             // Show caller info (default: true)
-  env: 'development',           // Environment mode (default: process.env.NODE_ENV)
-  exitOnError: true,            // Exit on uncaught errors (Node.js only)
-  suppressBrowserErrors: false, // Suppress browser error handling (default: false)
-  dynamicImport: false          // Enable lazy loading (CommonJS only, default: false)
+  showTimestamp: true,
+  showCaller: true,
+  env: 'development',
+  exitOnError: true,
+  suppressBrowserErrors: false,
+  dynamicImport: false
 });
 ```
 
 ---
 
-## 📖 Usage Examples
+## 🖥️ VSCode Extension Integration
 
-### Basic Logging
+### 📌 How It Works
+
+The **@hipstersantos/colorful-logger VSCode Extension** enhances the logging experience by providing **hover tooltips** for log statements directly inside the VSCode editor.
+
+- 🟢 **Hover Over Log Statements**: See simulated log output as a tooltip without running the code.
+- 🔍 **Highlighted Log Levels**: Log levels (`INFO`, `DEBUG`, `WARNING`, `ERROR`, `CRITICAL`) are emphasized for better readability.
+- 🚨 **Error Diagnostics & Fixes**: `logger.error()` statements include suggested fixes and stack traces in the tooltip.
+
+### 🔧 Installation
+
+1. Install the extension from the [VSCode Marketplace](https://marketplace.visualstudio.com/hipstersantos/colorful-logger).
+2. Enable the extension in your workspace settings.
+3. Hover over `logger.info()`, `logger.debug()`, etc., to see tooltips in action.
+
+### ⚡ Example Usage in VSCode
 
 ```javascript
+const logger = Logger.getLogger('App');
 logger.info('App started');
-logger.debug('Initializing');
-logger.warning('Low memory');
-logger.error('Failed to connect');
-logger.critical('System down');
+logger.error('Failed to connect', new Error('Timeout'));
 ```
 
-### Metadata Support
+✅ Hovering over `logger.info('App started')` will display:
 
-```javascript
-logger.info('User logged in', { userId: 123 });
-logger.warning('API limit', { limit: 1000, current: 995 });
-logger.info('Profile update', { user: { id: 1, name: 'Alice' } });
-logger.debug('Batch done', { items: [1, 2, 3] });
+```
+[INFO] 2025-03-04 10:30:15 - App started
 ```
 
-### Error Handling
+🚨 Hovering over `logger.error('Failed to connect')` will show:
 
-```javascript
-logger.error('DB error', new Error('Timeout'));
-logger.error('Manual trace', { stack: logger.getFullStack() });
-
-setTimeout(() => { throw new Error('Crash'); }, 1000);
-
-Promise.reject('Failed promise');
 ```
-
-### Customization
-
-```javascript
-const noTime = new Logger('NoTime', { showTimestamp: false });
-noTime.info('Quick log');
-
-const prod = new Logger('Prod', { env: 'production' });
-prod.debug('Hidden');
-prod.info('Visible');
-```
-
-### Multiple Loggers
-
-```javascript
-const auth = Logger.getLogger('Auth');
-const payment = Logger.getLogger('Payment');
-
-auth.info('User login');
-payment.info('Transaction started');
+[ERROR] 2025-03-04 10:30:20 - Failed to connect
+⚠️ Suggested Fix: Check network connection.
+🔗 Stack Trace: main.js:25
 ```
 
 ---
@@ -161,7 +147,7 @@ payment.info('Transaction started');
 |---------------------|----------|------------------|--------------------------------------------|
 | `showTimestamp`     | Boolean  | `true`           | Display timestamps in log messages.        |
 | `showCaller`        | Boolean  | `true`           | Display the caller function info.          |
-| `env`               | String   | `development`    | Environment mode (e.g., development, production). |
+| `env`               | String   | `development`    | Environment mode.                          |
 | `exitOnError`       | Boolean  | `true`           | Exit process on errors (Node.js only).     |
 | `suppressBrowserErrors` | Boolean  | `false`      | Suppress errors in the browser console.    |
 | `dynamicImport`     | Boolean  | `false`          | Enable lazy loading (CommonJS only).       |
@@ -177,16 +163,6 @@ payment.info('Transaction started');
 | `critical(message, meta)` | Logs a critical message (red background).    |
 | `getLogger(name, options)`| Creates a new logger instance.               |
 | `dynamicImport(name)`     | Lazily loads a logger (CommonJS only).       |
-
----
-
-## 📌 Integration & Use Cases
-
-- **Error Tracking**: Capture and log unhandled errors and rejections.
-- **Microservices**: Use named loggers for different services.
-- **Frontend Debugging**: Track user actions and browser events.
-- **Backend Monitoring**: Log API calls, database queries, and file operations.
-- **Testing**: Enhance test output with colorful, structured logs.
 
 ---
 
@@ -220,10 +196,10 @@ Author: [hipstersantos](mailto:santoscampos269@gmail.com)
 
 ## 📆 Changelog
 
-### 1.2.0 (March 2025)
+### 1.3.0 (March 2025)
 
-- Added ESM and CommonJS support.
-- Introduced automatic module detection.
-- Implemented `dynamicImport` for lazy loading.
-- Expanded examples to 50+ scenarios.
+- 🎉 Added VSCode extension integration with hover tooltips.
+- 🛠 Improved error diagnostics and fix suggestions.
+- 🚀 Enhanced color-coded logs for better readability.
+- 🔥 Performance optimizations for ESM and CommonJS.
 
