@@ -8,9 +8,11 @@ const COLORS = {
     CRITICAL: "\x1b[41m\x1b[37m",
 };
 
-const isESM = typeof import.meta !== 'undefined' || (typeof process !== 'undefined' && process.versions && process.versions.node && require.main && require.main.filename.endsWith('.mjs'));
-const isCommonJS = typeof module !== 'undefined' && module.exports && !isESM;
+// Safe module type detection
+const isCommonJS = typeof module !== 'undefined' && typeof module.exports !== 'undefined';
 const isBrowser = typeof window !== 'undefined' && typeof window.document !== 'undefined';
+// ESM detection: Check if we're not CommonJS and not in a browser (Node.js ESM or browser ESM)
+const isESM = !isCommonJS && !isBrowser || (typeof process !== 'undefined' && process.argv && process.argv[1] && process.argv[1].endsWith('.mjs'));
 
 class Logger {
     constructor(name = "root", options = {}) {
@@ -46,7 +48,7 @@ class Logger {
 
         const timestamp = this.options.showTimestamp ? new Date().toISOString() : "";
         const color = COLORS[level.toUpperCase()] || COLORS.INFO;
-        const callerInfo = this.options.showCaller ? this.getCallerInfo(4) : ""; // Offset for extension
+        const callerInfo = this.options.showCaller ? this.getCallerInfo(4) : "";
         const prefix = isBrowser
             ? `[${this.name}] [${level.toUpperCase()}]`
             : `${color}[${timestamp}] [${this.name}] [${level.toUpperCase()}]${this.options.showCaller ? ` [${callerInfo}]` : ""}${COLORS.RESET}`;
@@ -126,23 +128,32 @@ class Logger {
 
     static async dynamicImport(name = "root", options = {}) {
         if (isCommonJS) {
-            const module = await import('./logger.js');
-            return module.default.getLogger(name, { ...options, dynamicImport: true });
+            // Use dynamic import safely within CommonJS
+            return import('./logger.js').then(module => {
+                return module.default.getLogger(name, { ...options, dynamicImport: true });
+            }).catch(err => {
+                console.error('Dynamic import failed:', err);
+                throw err;
+            });
         }
         return Logger.getLogger(name, { ...options, dynamicImport: true });
     }
 }
 
+// ESM Export
 export default Logger;
 
+// CommonJS Export
 if (isCommonJS) {
     module.exports = Logger;
     module.exports.dynamicImport = Logger.dynamicImport;
 }
 
+// Auto-detection and usage example
 if (typeof require !== "undefined" && require.main === module) {
     (async () => {
         const logger = isESM || isBrowser ? Logger.getLogger("Test") : await Logger.dynamicImport("Test");
         logger.info("Logger initialized automatically");
+        logger.debug("Debugging mode", { moduleType: isESM ? "ESM" : isCommonJS ? "CommonJS" : "Browser" });
     })();
 }

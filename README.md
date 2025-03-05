@@ -202,4 +202,30 @@ Author: [hipstersantos](mailto:santoscampos269@gmail.com)
 - 🛠 Improved error diagnostics and fix suggestions.
 - 🚀 Enhanced color-coded logs for better readability.
 - 🔥 Performance optimizations for ESM and CommonJS.
+## Changes and Improvements
+
+-Safe ESM Detection:
+  Removed typeof import.meta !== 'undefined' from isESM check, as it’s invalid in CommonJS.
+
+- Replaced with a fallback: isESM = !isCommonJS && !isBrowser || (process.argv && process.argv[1].endsWith('.mjs')).
+
+This ensures no ReferenceError in Node.js CommonJS environments while still detecting ESM via .mjs or browser contexts.
+
+-Robust Module Detection:
+  isCommonJS: Checks module and module.exports, reliable in Node.js CommonJS.
+
+- isBrowser: Unchanged, safe for all environments.
+
+- isESM: Now infers ESM by exclusion or .mjs file extension, avoiding ESM-specific syntax.
+
+- Dynamic Import Handling:
+  Wrapped import('./logger.js') in a .then().catch() block to handle potential import failures gracefully in CommonJS.
+
+- Logs errors if dynamic import fails, preventing silent failures.
+
+- No Runtime Errors:
+  All checks use typeof or property existence, which are safe in any JS environment.
+
+- Removed reliance on require.main.filename, which could be undefined in some Node.js contexts,   replacing it with process.argv[1] for .mjs detection.
+
 
