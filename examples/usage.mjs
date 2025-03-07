@@ -1,5 +1,5 @@
-// examples/usage.js
-const Logger = require("../src/logger.cjs");
+// examples/usage.mjs
+import Logger from "../src/logger.js";
 
 let logg = new Logger('testing');
 logg.info('Im starting here');
@@ -42,10 +42,7 @@ asyncOperation();
 log.info('Null metadata test', null);
 
 // Cleanup
-if (typeof require !== 'undefined' && require.main === module) {
-    console.log('Running usage examples...');
-    setTimeout(() => {
-        log.info('Cleaning up logger instance');
-        log.destroy();
-    }, 2000); // Simulate cleanup after usage
-}
+setTimeout(() => {
+    log.info('Cleaning up logger instance');
+    log.destroy();
+}, 2000);

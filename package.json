@@ -1,19 +1,29 @@
 {
   "name": "@hipstersantos/colorful-logger",
-  "version": "1.5.0",
-  "description": "A colorful and feature-rich logging library for Node.js and browser",
-  "main": "src/logger.js",
-  "module": "src/logger.js",
+  "version": "1.6.0",
+  "description": "A self-adaptive colorful logging library for Node.js, React, and browsers with ESM and CommonJS support",
+  "main": "./src/logger.cjs",
+  "module": "./src/logger.js",
+  "type": "module",
   "exports": {
     ".": {
       "import": "./src/logger.js",
-      "require": "./src/logger.js"
+      "require": "./src/logger.cjs"
     }
   },
-  "keywords": ["logger", "logging", "debug", "console", "colorful"],
+  "keywords": [
+    "logger",
+    "debugging",
+    "node",
+    "react",
+    "browser",
+    "esm",
+    "commonjs"
+  ],
   "author": "hipstersantos <santoscampos269@gmail.com>",
   "license": "MIT",
-  "devDependencies": {
-    "eslint": "^8.0.0"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HipsterSantos/colorful-logger.git"
   }
 }

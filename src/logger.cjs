@@ -1,4 +1,4 @@
-// src/logger.js
+// src/logger.cjs
 const COLORS = {
     RESET: "\x1b[0m",
     INFO: "\x1b[34m",
@@ -25,15 +25,11 @@ try {
     isBrowser = false;
 }
 
-try {
-    isESM = !isCommonJS && !isBrowser || (typeof import.meta !== 'undefined');
-} catch (e) {
-    isESM = !isCommonJS && !isBrowser;
-}
+isESM = !isCommonJS && !isBrowser;
 
 // Global error handlers (registered once)
 let errorHandlersInitialized = false;
-const globalLoggerInstances = new Set();
+const globalLoggerInstances = new Set(); // Track instances for cleanup
 
 function initializeGlobalErrorHandlers() {
     if (errorHandlersInitialized || isBrowser) return;
@@ -81,7 +77,7 @@ class Logger {
             };
         }
         globalLoggerInstances.add(this);
-        initializeGlobalErrorHandlers();
+        initializeGlobalErrorHandlers(); // Ensure handlers are set up
     }
 
     getCallerInfo(stackOffset = 3) {
@@ -186,7 +182,7 @@ class Logger {
     }
 }
 
-export default Logger;
+module.exports = Logger;
 
 try {
     if (typeof require !== "undefined" && require.main === module) {
