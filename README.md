@@ -1,22 +1,24 @@
 # @hipstersantos/colorful-logger
 
-A feature-rich, colorful logging library for **Node.js** and **browser** environments, now with seamless support for **ES Modules (ESM)**, **CommonJS**, and **automatic module detection**.
+A lightweight, colorful logging utility for **Node.js** and **browser** environments, supporting both **CommonJS** and **ESM**. Ideal for debugging, monitoring, and production logging with customizable output.
 
 [GitHub Repository](https://github.com/HipsterSantos/log.js) | [npm Package](https://www.npmjs.com/package/@hipstersantos/colorful-logger)
+
+![npm version](https://badge.fury.io/js/@hipstersantos%2Fcolorful-logger.svg)
 
 ---
 
 ## 🚀 Features
 
-- 🎨 **Color-Coded Log Levels**: Visually distinguish `INFO`, `DEBUG`, `WARNING`, `ERROR`, and `CRITICAL` logs.
-- 📊 **Stack Tracing**: Get detailed caller information and full stack traces for easier debugging.
-- ⚙️ **Customizable Options**: Tailor logging behavior to your specific needs.
-- 🌐 **Universal Compatibility**: Works seamlessly in Node.js (ESM & CommonJS) and browser environments.
-- 🛡️ **Error Monitoring**: Automatically captures uncaught exceptions and unhandled promise rejections.
-- 📝 **Metadata Support**: Add rich context to logs with objects, arrays, or custom data.
-- 🔍 **Module Detection**: Automatically adapts to your project’s module system (ESM or CommonJS).
-- 📦 **Dynamic Import**: Supports lazy loading for performance optimization.
-- 🖥️ **VSCode Integration**: Displays log output directly in hover tooltips within VSCode.
+- 🎨 **Color-Coded Logs**: Info (blue), Debug (cyan), Warning (yellow), Error (red), Critical (white on red).
+- 📊 **Stack Tracing**: Includes caller information and full stack traces for better debugging.
+- ⚙️ **Customizable**: Toggle timestamps, caller info, and environment-specific behavior.
+- 🌐 **Universal Compatibility**: Supports **CommonJS** (`require`) and **ESM** (`import`).
+- 🛡️ **Error Monitoring**: Captures uncaught exceptions and unhandled promise rejections globally.
+- 🔍 **Dynamic Import**: Supports lazy loading for performance optimization.
+- 📝 **Metadata Support**: Enhance logs with objects, arrays, or custom data.
+- 📦 **Memory-Safe**: Prevents event listener leaks with single-instance global handlers.
+- 🖥️ **Browser-Friendly**: Uses collapsible console groups for complex metadata.
 
 ---
 
@@ -36,41 +38,41 @@ yarn add @hipstersantos/colorful-logger
 
 ---
 
-## 📚 Quick Start
-
-### ES Module (ESM)
-
-```javascript
-import Logger from '@hipstersantos/colorful-logger';
-
-const logger = Logger.getLogger('MyApp');
-logger.info('Hello from ESM!');
-```
+## 📚 Usage
 
 ### CommonJS
 
 ```javascript
 const Logger = require('@hipstersantos/colorful-logger');
 
-const logger = Logger.getLogger('MyApp');
-logger.info('Hello from CommonJS!');
+const log = new Logger('MyApp');
+log.info('Server started');
+log.debug('User request', { userId: 123 });
+log.error('Something went wrong', new Error('Oops'));
+
+// Cleanup (optional, recommended for long-running apps)
+log.destroy();
+```
+
+### ES Module (ESM)
+
+```javascript
+import Logger from '@hipstersantos/colorful-logger';
+
+const log = new Logger('MyApp');
+log.info('Server started');
+log.debug('User request', { userId: 123 });
+log.error('Something went wrong', new Error('Oops'));
+
+// Cleanup
+log.destroy();
 ```
 
 ### Dynamic Import (Lazy Loading)
 
 ```javascript
-const loggerPromise = require('@hipstersantos/colorful-logger').dynamicImport('MyApp');
-loggerPromise.then(logger => logger.info('Hello with dynamic import!'));
-```
-
-### Browser
-
-```html
-<script type="module">
-  import Logger from 'https://unpkg.com/@hipstersantos/colorful-logger@1.2.0/src/logger.js';
-  const logger = Logger.getLogger('BrowserApp');
-  logger.info('Hello from the browser!');
-</script>
+const logger = await Logger.dynamicImport('DynamicApp');
+logger.info('Loaded dynamically');
 ```
 
 ---
@@ -80,77 +82,25 @@ loggerPromise.then(logger => logger.info('Hello with dynamic import!'));
 Customize your logger:
 
 ```javascript
-const logger = new Logger('App', {
-  showTimestamp: true,
-  showCaller: true,
-  env: 'development',
-  exitOnError: true,
-  suppressBrowserErrors: false,
-  dynamicImport: false
+const log = new Logger('CustomApp', {
+  showTimestamp: false, // Hide timestamps
+  showCaller: false,    // Hide caller info
+  env: 'production',    // Suppress debug logs in production
 });
 ```
 
----
-
-## 🖥️ VSCode Extension Integration
-
-### 📌 How It Works
-
-The **@hipstersantos/colorful-logger VSCode Extension** enhances the logging experience by providing **hover tooltips** for log statements directly inside the VSCode editor.
-
-- 🟢 **Hover Over Log Statements**: See simulated log output as a tooltip without running the code.
-- 🔍 **Highlighted Log Levels**: Log levels (`INFO`, `DEBUG`, `WARNING`, `ERROR`, `CRITICAL`) are emphasized for better readability.
-- 🚨 **Error Diagnostics & Fixes**: `logger.error()` statements include suggested fixes and stack traces in the tooltip.
-
-### 🔧 Installation
-
-1. Install the extension from the [VSCode Marketplace](https://marketplace.visualstudio.com/hipstersantos/colorful-logger).
-2. Enable the extension in your workspace settings.
-3. Hover over `logger.info()`, `logger.debug()`, etc., to see tooltips in action.
-
-### ⚡ Example Usage in VSCode
-
-```javascript
-const logger = Logger.getLogger('App');
-logger.info('App started');
-logger.error('Failed to connect', new Error('Timeout'));
-```
-
-✅ Hovering over `logger.info('App started')` will display:
-
-```
-[INFO] 2025-03-04 10:30:15 - App started
-```
-
-🚨 Hovering over `logger.error('Failed to connect')` will show:
-
-```
-[ERROR] 2025-03-04 10:30:20 - Failed to connect
-⚠️ Suggested Fix: Check network connection.
-🔗 Stack Trace: main.js:25
-```
+| Option              | Type     | Default       | Description                                |
+|---------------------|----------|---------------|--------------------------------------------|
+| `showTimestamp`     | Boolean  | `true`        | Display timestamps in log messages.        |
+| `showCaller`        | Boolean  | `true`        | Display the caller function info.          |
+| `env`               | String   | `development` | Environment mode (e.g., 'production').     |
+| `exitOnError`       | Boolean  | `true`        | Exit process on errors (Node.js only).     |
+| `suppressBrowserErrors` | Boolean  | `false`    | Suppress errors in the browser console.    |
+| `dynamicImport`     | Boolean  | `false`       | Enable lazy loading (CommonJS only).       |
 
 ---
 
 ## 📊 API Reference
-
-### `Logger(name, options)`
-
-| Parameter  | Type    | Default          | Description                         |
-|------------|---------|------------------|-------------------------------------|
-| `name`     | String  | "root"           | Logger identifier.                  |
-| `options`  | Object  | `{}`             | Logger configuration options.       |
-
-### Options
-
-| Option              | Type     | Default          | Description                                |
-|---------------------|----------|------------------|--------------------------------------------|
-| `showTimestamp`     | Boolean  | `true`           | Display timestamps in log messages.        |
-| `showCaller`        | Boolean  | `true`           | Display the caller function info.          |
-| `env`               | String   | `development`    | Environment mode.                          |
-| `exitOnError`       | Boolean  | `true`           | Exit process on errors (Node.js only).     |
-| `suppressBrowserErrors` | Boolean  | `false`      | Suppress errors in the browser console.    |
-| `dynamicImport`     | Boolean  | `false`          | Enable lazy loading (CommonJS only).       |
 
 ### Methods
 
@@ -161,8 +111,55 @@ logger.error('Failed to connect', new Error('Timeout'));
 | `warning(message, meta)`  | Logs a warning message (yellow).             |
 | `error(message, meta)`    | Logs an error message (red) with stack trace.|
 | `critical(message, meta)` | Logs a critical message (red background).    |
-| `getLogger(name, options)`| Creates a new logger instance.               |
+| `destroy()`               | Cleans up event listeners and global tracking.|
+| `getLogger(name, options)`| Creates or retrieves a logger instance.       |
 | `dynamicImport(name)`     | Lazily loads a logger (CommonJS only).       |
+
+---
+
+## 📜 Changelog
+
+### v1.2.8 (March 07, 2025)
+
+**Memory Leak Prevention:**
+
+- Global error handlers (`uncaughtException`, `unhandledRejection`) are now registered only once, preventing listener accumulation.
+- Introduced `destroy()` method to remove logger instances and clean up global event listeners.
+
+**Robustness:**
+
+- Fixed handling of `null` metadata to prevent errors when accessing `stack`.
+
+**Compatibility:**
+
+- Fully backward-compatible with previous versions.
+
+### v1.2.7
+
+- Fixed `import.meta` usage in `.cjs` files, ensuring proper CommonJS compatibility.
+- Improved consistency by adding a local `package.json` in examples.
+
+### v1.2.6
+
+- Initial memory leak fix for `MaxListenersExceededWarning`.
+- Enhanced module type detection.
+
+---
+
+## 🛠️ Best Practices
+
+- **Cleanup:** Call `logger.destroy()` in long-running applications to free resources.
+- **Intervals:** Clear intervals or timeouts (e.g., `clearInterval`) to prevent memory leaks.
+- **Production:** Set `env: 'production'` to suppress debug logs automatically.
+
+---
+
+## 📊 Examples
+
+Explore comprehensive usage examples in the [examples](https://github.com/HipsterSantos/log.js/tree/main/examples) directory:
+
+- `usage.js` - CommonJS example.
+- `usage.mjs` - ESM example.
 
 ---
 
@@ -178,54 +175,5 @@ npm test
 
 ## 📜 License
 
-Released under the [MIT License](LICENSE).
-
----
-
-## 🤝 Contributing
-
-Fork the repository, create a feature branch, and submit a pull request.
-
----
-
-## 📧 Contact
-
-Author: [hipstersantos](mailto:santoscampos269@gmail.com)
-
----
-
-## 📆 Changelog
-
-### 1.3.0 (March 2025)
-
-- 🎉 Added VSCode extension integration with hover tooltips.
-- 🛠 Improved error diagnostics and fix suggestions.
-- 🚀 Enhanced color-coded logs for better readability.
-- 🔥 Performance optimizations for ESM and CommonJS.
-## Changes and Improvements
-
--Safe ESM Detection:
-  Removed typeof import.meta !== 'undefined' from isESM check, as it’s invalid in CommonJS.
-
-- Replaced with a fallback: isESM = !isCommonJS && !isBrowser || (process.argv && process.argv[1].endsWith('.mjs')).
-
-This ensures no ReferenceError in Node.js CommonJS environments while still detecting ESM via .mjs or browser contexts.
-
--Robust Module Detection:
-  isCommonJS: Checks module and module.exports, reliable in Node.js CommonJS.
-
-- isBrowser: Unchanged, safe for all environments.
-
-- isESM: Now infers ESM by exclusion or .mjs file extension, avoiding ESM-specific syntax.
-
-- Dynamic Import Handling:
-  Wrapped import('./logger.js') in a .then().catch() block to handle potential import failures gracefully in CommonJS.
-
-- Logs errors if dynamic import fails, preventing silent failures.
-
-- No Runtime Errors:
-  All checks use typeof or property existence, which are safe in any JS environment.
-
-- Removed reliance on require.main.filename, which could be undefined in some Node.js contexts,   replacing it with process.argv[1] for .mjs detection.
-
+Licensed under the [MIT License](LICENSE).
 

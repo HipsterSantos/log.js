@@ -1,6 +1,6 @@
 {
   "name": "@hipstersantos/colorful-logger",
-  "version": "1.6.0",
+  "version": "1.2.8",
   "description": "A self-adaptive colorful logging library for Node.js, React, and browsers with ESM and CommonJS support",
   "main": "./src/logger.cjs",
   "module": "./src/logger.js",
