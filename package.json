@@ -1,6 +1,6 @@
 {
   "name": "@hipstersantos/colorful-logger",
-  "version": "1.2.8",
+  "version": "1.2.9",
   "description": "A self-adaptive colorful logging library for Node.js, React, and browsers with ESM and CommonJS support",
   "main": "./src/logger.cjs",
   "module": "./src/logger.js",
@@ -24,6 +24,6 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/HipsterSantos/colorful-logger.git"
+    "url": "https://github.com/HipsterSantos/log.js"
   }
 }
